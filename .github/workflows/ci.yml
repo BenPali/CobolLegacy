@@ -24,9 +24,15 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        pytest tests.py -v --cov=main --cov=operations --cov=data --cov-report=term-missing | tee test_output.txt
+        pytest tests.py -v --cov=main --cov=operations --cov=data --cov-report=term-missing --cov-report=xml
 
         echo "## Test Coverage Report" >> $GITHUB_STEP_SUMMARY
         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-        tail -n 20 test_output.txt | grep -E "(Name|---|main|operations|data|TOTAL)" >> $GITHUB_STEP_SUMMARY || tail -n 10 test_output.txt >> $GITHUB_STEP_SUMMARY
+        pytest tests.py --quiet --cov=main --cov=operations --cov=data --cov-report=term-missing | grep -A 10 "Name.*Stmts.*Miss.*Cover" >> $GITHUB_STEP_SUMMARY
         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.xml
+        fail_ci_if_error: false
