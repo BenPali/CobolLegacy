@@ -24,8 +24,9 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        pytest tests.py -v --cov=main --cov=operations --cov=data --cov-report=term-missing
+        pytest tests.py -v --cov=main --cov=operations --cov=data --cov-report=term-missing | tee test_output.txt
+
         echo "## Test Coverage Report" >> $GITHUB_STEP_SUMMARY
         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-        pytest tests.py --quiet --cov=main --cov=operations --cov=data --cov-report=term-missing | tail -n 5 >> $GITHUB_STEP_SUMMARY
+        tail -n 20 test_output.txt | grep -E "(Name|---|main|operations|data|TOTAL)" >> $GITHUB_STEP_SUMMARY || tail -n 10 test_output.txt >> $GITHUB_STEP_SUMMARY
         echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
